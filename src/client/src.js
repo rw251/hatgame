@@ -95,3 +95,4 @@ wsc.onmessage = function (evt) {
 };
 
 init();
+
