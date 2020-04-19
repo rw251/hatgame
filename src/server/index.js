@@ -25,58 +25,78 @@ app.get('*', function(req, res){
 });
 
 const wsClients = {};
+const rooms = {};
 const wss = new WebSocketServer({ server });
 const id = () => Math.floor(Math.random()*10000000000);
 
 server.on('request', app);
+
+const createRoom = (hostId, roomId) => {
+  const lowerRoomId = roomId.toLowerCase();
+  wsClients[hostId].hosting = true;
+  wsClients[hostId].rooms.push(lowerRoomId);
+  rooms[lowerRoomId] = { host: hostId, participants: {} };
+  rooms[lowerRoomId].participants[hostId] = true;
+};
+
+const updateCount = (roomId) => {
+  const count = Object.keys(rooms[roomId].participants).length;
+  Object.keys(rooms[roomId].participants)
+    .forEach(person => wsClients[person].ws.send(JSON.stringify({type: 'count', count})));
+};
+
+const getCleanRoomId = (roomId) => {
+  let cleanRoomIdBits = roomId.toLowerCase().split(/[^a-z]/).filter(x => x !== '');
+  return cleanRoomIdBits.join('-');
+}
+const joinRoom = (participantId, roomId) => {
+  const cleanRoomId = getCleanRoomId(roomId);
+  if(!rooms[cleanRoomId]) {
+    return wsClients[participantId].ws.send(JSON.stringify({type:'noRoom', roomId: cleanRoomId}));
+  }
+  rooms[cleanRoomId].participants[participantId] = true;
+  wsClients[participantId].rooms.push(cleanRoomId);
+  updateCount(cleanRoomId);
+};
+
+const leaveRoom = (participantId, roomId) => {
+  if(!rooms[roomId]) return;
+  delete rooms[roomId].participants[participantId];
+  updateCount(roomId);
+};
+
+const leaveAllRooms = (participantId) => {
+  wsClients[participantId].rooms.forEach(roomId => leaveRoom(participantId, roomId));
+  delete wsClients[participantId];
+}
 
 wss.on('connection', (ws) => {
 
   const connId = id();
   console.log('connection up', connId);
 
-  wsClients[connId] = { ws };
+  wsClients[connId] = { ws, rooms: [] };
 
   //connection is up, let's add a simple simple event
   ws.on('message', (message) => {
     const signal = JSON.parse(message);
     switch(signal.type) {
-      case 'offer': {
-        const { remoteId, ...rest } = signal;
-        rest.remoteId = connId;
-        wsClients[remoteId].ws.send(JSON.stringify(rest));
-        break;
-      }
-      case 'answer': {
-        const { remoteId, ...rest } = signal;
-        rest.remoteId = connId;
-        wsClients[remoteId].ws.send(JSON.stringify(rest));
-        break;
-      }
       case 'join':
-        //join room
-        wsClients[connId].ws.send(JSON.stringify({
-          type:'participantList', 
-          participants: Object.keys(wsClients[signal.roomId].participants),
-        }));
-        wsClients[signal.roomId].participants[connId] = true;
-        wsClients[connId].roomId = signal.roomId;
-        break;
-      case 'ice':
-        const { remoteId, ...rest } = signal;
-        rest.remoteId = connId;
-        wsClients[remoteId].ws.send(JSON.stringify(rest));
+        joinRoom(connId, signal.roomId);
         break;
       case 'host':
-        wsClients[connId].hosting = true;
-        wsClients[connId].participants = {};
-        //wsClients[connId].participants[connId] = true;
+        createRoom(connId, signal.roomId);
         break;
-      case 'hangup':
+      case 'leave':
+        leaveRoom(connId, signal.roomId);
         break;
       default:
         console.log(signal);
     }
+  });
+
+  ws.on('close', () => {
+    leaveAllRooms(connId);
   });
 
   //send immediatly a feedback to the incoming connection    

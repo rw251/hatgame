@@ -58,12 +58,34 @@
       border-radius: 0.5rem;
       padding: 1em;
     }
+    #game-bar {
+      grid-template-columns: 1fr 1fr;
+      background: #f0d954;
+    }
+    #game-bar span {
+      font-size: 1.5rem;
+      line-height: 2.5rem;
+      padding: 0 5px;
+    }
+    .hide {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="landing-buttons" class="page">
     <button id="hostBtn" class="landing-page-button">Host a new game</button>
     <button id="joinBtn" class="landing-page-button">Join an existing game</button>
+  </div>
+
+  <div id="game-bar" class="page">
+    <span id="room-link" class="hide"></span>
+    <span id="people-counter">Participants: 1</span>
+  </div>
+
+  <div id="join-dialog" class="page">
+    <input id="join-room-input" type="text" placeholder="Please enter your room name" />
+    <button class="submit" id="join-submit">Go!</button>
   </div>
 
   <script src="/src.js"></script>
