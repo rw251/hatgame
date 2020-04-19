@@ -1,0 +1,25 @@
+{
+  "name": "hatgame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server/index.js",
+  "scripts": {
+    "open": "start http://localhost:3091",
+    "prestart": "npm run open",
+    "start": "nodemon api/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "10.x"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-force-ssl": "^0.3.2",
+    "morgan": "^1.10.0",
+    "ws": "^7.2.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
