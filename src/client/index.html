@@ -50,25 +50,92 @@
       border: 0;
       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
       cursor: pointer;
-      overflow: hidden;
       margin: 0.5rem;
       min-width: 200px;
       max-width: 500px;
       min-height: 50px;
       border-radius: 0.5rem;
       padding: 1em;
+      position: relative;
+    }
+    /* Pre-render the bigger shadow, but hide it */
+    .landing-page-button::after {
+      content: '';
+      position: absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+      border-radius: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    /* Transition to showing the bigger shadow on hover */
+    .landing-page-button:hover:after {
+      opacity: 1;
     }
     #game-bar {
       grid-template-columns: 1fr 1fr;
       background: #f0d954;
+      flex-wrap: wrap;
     }
     #game-bar span {
       font-size: 1.5rem;
       line-height: 2.5rem;
       padding: 0 5px;
+      flex-grow: 1;
+    }
+    #people-counter {
+      background: purple;
+      color: white;
+    }
+    #game-bar span:nth-child(1) {
+      flex-grow:100;
     }
     .hide {
       display: none;
+    }
+    form.input-with-button {
+      max-width: 500px;
+      margin: 10px auto;
+    }
+    form.input-with-button input[type=text] {
+      padding: 10px;
+      font-size: 2rem;
+      line-height: 4rem;
+      border: 1px solid grey;
+      float: left;
+      width: 80%;
+      border-radius: 10px 0 0 10px;
+      text-align: center;
+    }
+    form.input-with-button input[type=text]:focus {
+      border-radius: 0;
+    }
+    form.input-with-button button {
+      float: left;
+      width: 20%;
+      padding: 10px;
+      background: #2196F3;
+      color: white;
+      font-size: 2rem;
+      line-height: 4rem;
+      border: 1px solid grey;
+      border-left: none;
+      cursor: pointer;
+      border-radius: 0 10px 10px 0;
+    }
+
+    form.input-with-button button:hover {
+      background: #0b7dda;
+    }
+
+    form.input-with-button::after {
+      content: "";
+      clear: both;
+      display: table;
     }
   </style>
 </head>
@@ -84,8 +151,10 @@
   </div>
 
   <div id="join-dialog" class="page">
-    <input id="join-room-input" type="text" placeholder="Please enter your room name" />
-    <button class="submit" id="join-submit">Go!</button>
+    <form class="input-with-button" onsubmit="return false">
+      <input id="join-room-input" type="text" placeholder="Enter the room name" />
+      <button id="join-submit">🡆</button>
+    </form>
   </div>
 
   <script src="/src.js"></script>
