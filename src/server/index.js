@@ -31,18 +31,22 @@ const id = () => Math.floor(Math.random()*10000000000);
 
 server.on('request', app);
 
-const createRoom = (hostId, roomId) => {
+const createRoom = (hostId, roomId, game) => {
   const lowerRoomId = roomId.toLowerCase();
   wsClients[hostId].hosting = true;
   wsClients[hostId].rooms.push(lowerRoomId);
   rooms[lowerRoomId] = { host: hostId, participants: {} };
   rooms[lowerRoomId].participants[hostId] = true;
+  rooms[lowerRoomId].state = { game };
 };
 
 const updateCount = (roomId) => {
-  const count = Object.keys(rooms[roomId].participants).length;
+  rooms[roomId].state.count = Object.keys(rooms[roomId].participants).length;
+};
+
+const updateState = (roomId) => {
   Object.keys(rooms[roomId].participants)
-    .forEach(person => wsClients[person].ws.send(JSON.stringify({type: 'count', count})));
+    .forEach(person => wsClients[person].ws.send(JSON.stringify({type: 'state', ...rooms[roomId].state})));
 };
 
 const getCleanRoomId = (roomId) => {
@@ -57,18 +61,33 @@ const joinRoom = (participantId, roomId) => {
   rooms[cleanRoomId].participants[participantId] = true;
   wsClients[participantId].rooms.push(cleanRoomId);
   updateCount(cleanRoomId);
+  updateState(cleanRoomId);
 };
 
 const leaveRoom = (participantId, roomId) => {
   if(!rooms[roomId]) return;
   delete rooms[roomId].participants[participantId];
   updateCount(roomId);
+  updateState(roomId);
 };
 
 const leaveAllRooms = (participantId) => {
   wsClients[participantId].rooms.forEach(roomId => leaveRoom(participantId, roomId));
   delete wsClients[participantId];
 }
+
+// GAME SPECIFIC METHODS
+const addCategory = (roomId, category) => {
+  if(!rooms[roomId].state.categories) rooms[roomId].state.categories = [];
+  rooms[roomId].state.categories.push(category);
+  updateState(roomId);
+}
+
+const games = {
+  scattegories: {
+    addCategory
+  }
+};
 
 wss.on('connection', (ws) => {
 
@@ -85,10 +104,13 @@ wss.on('connection', (ws) => {
         joinRoom(connId, signal.roomId);
         break;
       case 'host':
-        createRoom(connId, signal.roomId);
+        createRoom(connId, signal.roomId, signal.game);
         break;
       case 'leave':
         leaveRoom(connId, signal.roomId);
+        break;
+      case 'scattergories-add-category':
+        games.scattegories.addCategory(signal.roomId, signal.category);
         break;
       default:
         console.log(signal);

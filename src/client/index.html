@@ -37,7 +37,7 @@
       margin: 0 auto;
       width: 100%;
       justify-content: center;
-      position: fixed;
+      /*position: fixed;*/
     }
     .landing-page-button {
       font-size: 1.8rem;
@@ -51,13 +51,14 @@
       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       margin: 0.5rem;
-      min-width: 200px;
+      width: 98vw;
       max-width: 500px;
       min-height: 50px;
       border-radius: 0.5rem;
       padding: 1em;
       position: relative;
     }
+
     /* Pre-render the bigger shadow, but hide it */
     .landing-page-button::after {
       content: '';
@@ -141,13 +142,32 @@
 </head>
 <body>
   <div id="landing-buttons" class="page">
+    <h2>Games</h2>
     <button id="hostBtn" class="landing-page-button">Host a new game</button>
     <button id="joinBtn" class="landing-page-button">Join an existing game</button>
+  </div>
+
+  <div id="game-chooser" class="page">
+    <h2>Which game?</h2>
+    <button data-game="hat" class="landing-page-button game-chooser">Who's in the hat?</button>
+    <button data-game="scattergories" class="landing-page-button game-chooser">Scattergories</button>
+    <button data-game="exlibris" class="landing-page-button game-chooser">Ex libris (first line game)</button>
   </div>
 
   <div id="game-bar" class="page">
     <span id="room-link" class="hide"></span>
     <span id="people-counter">Participants: 1</span>
+  </div>
+
+  <div id="scattergories" class="page">
+    <h2>Categories</h2>
+    <ul id="existing-categories">
+      <li>Currently no categories - add some below...</li>
+    </ul>
+    <form class="input-with-button" onsubmit="return false">
+      <input id="new-category-input" type="text" placeholder="Enter a category" />
+      <button id="new-category-submit">🡆</button>
+    </form>
   </div>
 
   <div id="join-dialog" class="page">
