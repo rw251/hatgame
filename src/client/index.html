@@ -165,7 +165,6 @@
       width: 100%;
       font-size: 150px;
       transition: transform 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28), opacity 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28);
-      display: none;
     }
     #round-countdown.counting {
       transform: scale(0.67);
@@ -177,7 +176,7 @@
   </style>
 </head>
 <body>
-  <div id="round-countdown">3</div>
+  <div id="round-countdown" class="done">3</div>
   <div id="landing-buttons" class="page">
     <h2>Games</h2>
     <button id="hostBtn" class="landing-page-button">Host a new game</button>
