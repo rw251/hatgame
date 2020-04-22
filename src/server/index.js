@@ -37,7 +37,7 @@ const createRoom = (hostId, roomId, game) => {
   wsClients[hostId].rooms.push(lowerRoomId);
   rooms[lowerRoomId] = { host: hostId, participants: {} };
   rooms[lowerRoomId].participants[hostId] = true;
-  rooms[lowerRoomId].state = { game };
+  rooms[lowerRoomId].state = { game, count: 1 };
 };
 
 const updateCount = (roomId) => {
@@ -49,12 +49,8 @@ const updateState = (roomId) => {
     .forEach(person => wsClients[person].ws.send(JSON.stringify({type: 'state', ...rooms[roomId].state})));
 };
 
-const getCleanRoomId = (roomId) => {
-  let cleanRoomIdBits = roomId.toLowerCase().split(/[^a-z]/).filter(x => x !== '');
-  return cleanRoomIdBits.join('-');
-}
 const joinRoom = (participantId, roomId) => {
-  const cleanRoomId = getCleanRoomId(roomId);
+  const cleanRoomId = roomId;
   if(!rooms[cleanRoomId]) {
     return wsClients[participantId].ws.send(JSON.stringify({type:'noRoom', roomId: cleanRoomId}));
   }
@@ -82,10 +78,15 @@ const addCategory = (roomId, category) => {
   rooms[roomId].state.categories.push(category);
   updateState(roomId);
 }
+const removeCategory = (roomId, category) => {
+  rooms[roomId].state.categories = rooms[roomId].state.categories.filter(x => x !== category);
+  updateState(roomId);
+}
 
 const games = {
   scattegories: {
-    addCategory
+    addCategory,
+    removeCategory,
   }
 };
 
@@ -111,6 +112,9 @@ wss.on('connection', (ws) => {
         break;
       case 'scattergories-add-category':
         games.scattegories.addCategory(signal.roomId, signal.category);
+        break;
+      case 'scattergories-remove-category':
+        games.scattegories.removeCategory(signal.roomId, signal.category);
         break;
       default:
         console.log(signal);

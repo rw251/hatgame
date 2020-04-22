@@ -61,7 +61,7 @@ const setParticipantCount = (count) => {
   $peopleCounter.innerText = `Participants: ${count}`;
 }
 const setCategories = (categories) => {
-  $existingCategories.innerHTML = categories.map(category => `<li>${category}</li>`).join('');
+  $existingCategories.innerHTML = categories.map(category => `<li>${category} <span data-category="${category}">X</span></li>`).join('');
 }
 const showGame = (game) => {
   // hideAllElements();
@@ -89,11 +89,20 @@ function init() {
     $joinBtn.addEventListener('click', showJoinDialog);
     $joinSubmit.addEventListener('click', joinRoom);
     $newCategorySubmit.addEventListener('click', newCategory);
+    $existingCategories.addEventListener('click', removeCategory);
+  }
+}
+
+function removeCategory(e) {
+  if(e.target.tagName.toLowerCase() === 'span') {
+    const { category } = e.target.dataset;
+    wsc.send(JSON.stringify({type: 'scattergories-remove-category', roomId, category }))
   }
 }
 
 function newCategory () {
   const category = $newCategoryInput.value;
+  $newCategoryInput.value = '';
   wsc.send(JSON.stringify({ type: 'scattergories-add-category', roomId, category }));
 }
 
@@ -109,16 +118,21 @@ async function createRoom() {
   wsc.send(JSON.stringify({ type:'host', roomId, game }));
 }
 
+const getCleanRoomId = (roomId) => {
+  let cleanRoomIdBits = roomId.toLowerCase().split(/[^a-z]/).filter(x => x !== '');
+  return cleanRoomIdBits.join('-');
+}
+
 async function joinRoom(localRoomId) {
   if(!isWebSocketOpen) {
     setTimeout(() => {
-      joinRoom(roomId);
+      joinRoom(localRoomId);
     }, 10);
   }
 
   roomId = typeof(localRoomId) === 'string'
     ? localRoomId
-    : $joinRoomInput.value;
+    : getCleanRoomId($joinRoomInput.value);
 
   // update url if not already
   const newUrl = `/${roomId}`;
@@ -136,7 +150,7 @@ function updateState(state) {
   game = state.game;
   if(game === 'scattergories') {
     showGame(game);
-    setCategories(state.categories);
+    if(state.categories) setCategories(state.categories);
   }
 }
 

@@ -110,10 +110,16 @@
       float: left;
       width: 80%;
       border-radius: 10px 0 0 10px;
-      text-align: center;
+      outline: none;
+    }
+    form.input-with-button input[type=text]::placeholder {
+      transition: opacity 0.5s; 
+    }
+    form.input-with-button input[type=text]:focus::placeholder {
+      opacity: 0;
     }
     form.input-with-button input[type=text]:focus {
-      border-radius: 0;
+      border-color: blue;
     }
     form.input-with-button button {
       float: left;
@@ -138,6 +144,16 @@
       clear: both;
       display: table;
     }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul li {
+      line-height: 30px;
+    }
   </style>
 </head>
 <body>
@@ -160,14 +176,14 @@
   </div>
 
   <div id="scattergories" class="page">
-    <h2>Categories</h2>
-    <ul id="existing-categories">
-      <li>Currently no categories - add some below...</li>
-    </ul>
     <form class="input-with-button" onsubmit="return false">
       <input id="new-category-input" type="text" placeholder="Enter a category" />
       <button id="new-category-submit">🡆</button>
     </form>
+    <h2>Categories</h2>
+    <ul id="existing-categories">
+      <li>Currently no categories - add some in the box above...</li>
+    </ul>
   </div>
 
   <div id="join-dialog" class="page">
