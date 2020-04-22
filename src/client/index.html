@@ -154,9 +154,30 @@
     ul li {
       line-height: 30px;
     }
+
+    .host-only {
+      display: none;
+    }
+    #round-countdown {
+      position: fixed;
+      top: 40vh;
+      text-align: center;
+      width: 100%;
+      font-size: 150px;
+      transition: transform 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28), opacity 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28);
+      display: none;
+    }
+    #round-countdown.counting {
+      transform: scale(0.67);
+      opacity: 0;
+    }
+    #round-countdown.done {
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <div id="round-countdown">3</div>
   <div id="landing-buttons" class="page">
     <h2>Games</h2>
     <button id="hostBtn" class="landing-page-button">Host a new game</button>
@@ -175,15 +196,22 @@
     <span id="people-counter">Participants: 1</span>
   </div>
 
-  <div id="scattergories" class="page">
+  <div id="scattergories-setup" class="page">
+    <h2>Categories</h2>
     <form class="input-with-button" onsubmit="return false">
       <input id="new-category-input" type="text" placeholder="Enter a category" />
-      <button id="new-category-submit">🡆</button>
+      <button id="new-category-submit">+</button>
     </form>
-    <h2>Categories</h2>
     <ul id="existing-categories">
       <li>Currently no categories - add some in the box above...</li>
     </ul>
+    <button id="start-game" class="landing-page-button host-only">Start game</button>
+  </div>
+  
+  <div id="scattergories-game" class="page">
+    <h2>A round</h2>
+    <form id="category-inputs" class="category-inputs" onsubmit="return false"></form>
+    <button id="ready-button" class="landing-page-button">I'm ready</button>
   </div>
 
   <div id="join-dialog" class="page">

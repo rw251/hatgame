@@ -36,13 +36,23 @@ const createRoom = (hostId, roomId, game) => {
   wsClients[hostId].hosting = true;
   wsClients[hostId].rooms.push(lowerRoomId);
   rooms[lowerRoomId] = { host: hostId, participants: {} };
-  rooms[lowerRoomId].participants[hostId] = true;
+  rooms[lowerRoomId].participants[hostId] = { state: 'not-ready' };
   rooms[lowerRoomId].state = { game, count: 1 };
 };
 
 const updateCount = (roomId) => {
   rooms[roomId].state.count = Object.keys(rooms[roomId].participants).length;
 };
+
+const updateReadiness = (roomId) => {
+  rooms[roomId].state.readyCount = Object
+    .values(rooms[roomId].participants)
+    .filter(x => x.state === 'ready')
+    .length;
+  if(rooms[roomId].state.readyCount === rooms[roomId].state.count) {
+    rooms[roomId].state.status = 'ready';
+  }
+}
 
 const updateState = (roomId) => {
   Object.keys(rooms[roomId].participants)
@@ -54,7 +64,7 @@ const joinRoom = (participantId, roomId) => {
   if(!rooms[cleanRoomId]) {
     return wsClients[participantId].ws.send(JSON.stringify({type:'noRoom', roomId: cleanRoomId}));
   }
-  rooms[cleanRoomId].participants[participantId] = true;
+  rooms[cleanRoomId].participants[participantId] = {state: 'not-ready'};
   wsClients[participantId].rooms.push(cleanRoomId);
   updateCount(cleanRoomId);
   updateState(cleanRoomId);
@@ -82,11 +92,22 @@ const removeCategory = (roomId, category) => {
   rooms[roomId].state.categories = rooms[roomId].state.categories.filter(x => x !== category);
   updateState(roomId);
 }
+const startScattergories = (roomId) => {
+  rooms[roomId].state.status = 'waiting';
+  updateState(roomId);
+}
+const readyScattergories = (participantId, roomId) => {
+  rooms[roomId].participants[participantId].state = 'ready';
+  updateReadiness(roomId);
+  updateState(roomId);
+}
 
 const games = {
   scattegories: {
     addCategory,
     removeCategory,
+    start: startScattergories,
+    ready: readyScattergories,
   }
 };
 
@@ -115,6 +136,12 @@ wss.on('connection', (ws) => {
         break;
       case 'scattergories-remove-category':
         games.scattegories.removeCategory(signal.roomId, signal.category);
+        break;
+      case 'scattergories-start':
+        games.scattegories.start(signal.roomId);
+        break;
+      case 'scattergories-ready':
+        games.scattegories.ready(connId, signal.roomId);
         break;
       default:
         console.log(signal);
