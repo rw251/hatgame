@@ -173,18 +173,32 @@ function joinRoom(localRoomId) {
   wsc.send(JSON.stringify({ type: 'join', roomId }));
 }
 
-function doCountdown(callback, n = 3) {
-  const $el = document.getElementById('round-countdown');
-  $el.classList.remove('done');
-  $el.innerText = n;
-  $el.classList.add('counting');
+var startTime;
+
+function doCountdown(callback) {
+  const $3 = document.getElementById('c3');
+  const $2 = document.getElementById('c2');
+  const $1 = document.getElementById('c1');
+  const $go = document.getElementById('cgo');
+
+  $3.classList.add('counting');
+
   setTimeout(() => {
-    $el.classList.add('done');
-  }, 750);
-  setTimeout(() => {
-    if(n-1===0) return callback();
-    doCountdown(callback, n - 1);
+    $2.classList.add('counting');
+
+    setTimeout(() => {
+      $1.classList.add('counting');
+      setTimeout(() => {
+        $go.classList.add('counting');
+        callback();
+      }, 1000);
+    }, 1000);
   }, 1000);
+}
+
+function startCountdown(callback) {
+  startTime = Date.now();
+  requestAnimationFrame(doCountdown(callback));
 }
 
 function updateState(state) {
@@ -197,6 +211,7 @@ function updateState(state) {
       setCategoryInputs(state.categories);
     } else if (state.status === 'ready') {
       $readyButton.innerText = 'STOP';
+      $readyButton.setAttribute('disabled', 'disabled');
       doCountdown(() => console.log('done'));
     } else {      
       showGame(game);

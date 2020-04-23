@@ -57,6 +57,7 @@
       border-radius: 0.5rem;
       padding: 1em;
       position: relative;
+      outline: none;
     }
 
     /* Pre-render the bigger shadow, but hide it */
@@ -77,6 +78,14 @@
     .landing-page-button:hover:after {
       opacity: 1;
     }
+    .landing-page-button:disabled {
+      background: #b3bccc;
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    .landing-page-button:disabled:hover:after {
+      opacity: 0;
+    }
+
     #game-bar {
       grid-template-columns: 1fr 1fr;
       background: #f0d954;
@@ -133,6 +142,7 @@
       border-left: none;
       cursor: pointer;
       border-radius: 0 10px 10px 0;
+      outline: none;
     }
 
     form.input-with-button button:hover {
@@ -159,24 +169,47 @@
       display: none;
     }
     #round-countdown {
-      position: fixed;
+      position: absolute;
       top: 40vh;
       text-align: center;
       width: 100%;
       font-size: 150px;
-      transition: transform 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28), opacity 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28);
+    }    
+    @keyframes pulse {
+      0% {
+        /* opacity: 0; */
+        transform: scale(0.05);
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.75);
+      }
     }
-    #round-countdown.counting {
-      transform: scale(0.67);
+    #round-countdown div{
+      position: absolute;
+      top:0;
+      width: 100%;
       opacity: 0;
-    }
-    #round-countdown.done {
-      display: none;
+      /* animation-duration: 1s; */
+      /* transform: ;
+      transition: transform 0.95s cubic-bezier(0.29, -0.4, 0.6, 1.28), opacity 0.5s cubic-bezier(0.29, -0.4, 0.6, 1.28); */
+    }    
+    #round-countdown div.counting {
+      animation: pulse 1s forwards;
     }
   </style>
 </head>
 <body>
-  <div id="round-countdown" class="done">3</div>
+  <div id="round-countdown" class="done">
+    <div id="c3">3</div>
+    <div id="c2">2</div>
+    <div id="c1">1</div>
+    <div id="cgo">Go!</div>
+  </div>
   <div id="landing-buttons" class="page">
     <h2>Games</h2>
     <button id="hostBtn" class="landing-page-button">Host a new game</button>
