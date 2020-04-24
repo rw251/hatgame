@@ -102,12 +102,46 @@ const readyScattergories = (participantId, roomId) => {
   updateState(roomId);
 }
 
+const startHatGame = (roomId, connId) => {
+  rooms[roomId].state.status = 'playing';
+  updateState(roomId);
+  wsClients[connId].ws.send(JSON.stringify({type:'hatgame-names', names: rooms[roomId].names}));
+}
+const addName = (roomId, name) => {
+  if(!rooms[roomId].names) rooms[roomId].names = [];
+  rooms[roomId].names.push(name);
+  rooms[roomId].state.numberOfNames = rooms[roomId].names.length;
+  updateState(roomId);
+}
+
+const endHatGameRound = (roomId, progress, isDeckEmpty) => {
+  rooms[roomId].state.status = 'results';
+  if(!rooms[roomId].doneNames) rooms[roomId].doneNames = [];
+  rooms[roomId].names.forEach((name) => {
+    if(progress[name]) rooms[roomId].doneNames.push(name);
+  });
+  rooms[roomId].names = rooms[roomId].names.filter(name => !progress[name]);
+  const namesLeft = rooms[roomId].names.length;
+  if(namesLeft === 0) {
+    rooms[roomId].names = rooms[roomId].doneNames;
+    rooms[roomId].doneNames = [];
+  }
+  rooms[roomId].state.namesLeft = rooms[roomId].names.length;
+  rooms[roomId].state.progress = progress;
+  updateState(roomId);
+}
+
 const games = {
   scattegories: {
     addCategory,
     removeCategory,
     start: startScattergories,
     ready: readyScattergories,
+  },
+  hatgame: {
+    addName,
+    start: startHatGame,
+    endround: endHatGameRound,
   }
 };
 
@@ -131,6 +165,15 @@ wss.on('connection', (ws) => {
       case 'leave':
         leaveRoom(connId, signal.roomId);
         break;
+      case 'hatgame-round-ends':
+        games.hatgame.endround(signal.roomId, signal.progress, signal.isDeckEmpty);
+        break;
+      case 'hatgame-add-name':
+        games.hatgame.addName(signal.roomId, signal.name);
+        break;
+      case 'hatgame-start':
+        games.hatgame.start(signal.roomId, connId);
+        break;
       case 'scattergories-add-category':
         games.scattegories.addCategory(signal.roomId, signal.category);
         break;
@@ -138,7 +181,7 @@ wss.on('connection', (ws) => {
         games.scattegories.removeCategory(signal.roomId, signal.category);
         break;
       case 'scattergories-start':
-        games.scattegories.start(signal.roomId);
+        games.scattegories.start(signal.roomId, connId);
         break;
       case 'scattergories-ready':
         games.scattegories.ready(connId, signal.roomId);

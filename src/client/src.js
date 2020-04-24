@@ -22,17 +22,25 @@ const $newCategorySubmit = document.getElementById('new-category-submit');
 const $peopleCounter = document.getElementById('people-counter');
 const $joinRoomInput = document.getElementById('join-room-input');
 const $newCategoryInput = document.getElementById('new-category-input');
+const $newNameInput = document.getElementById('new-hat-name-input');
 const $gameChooser = document.getElementById('game-chooser');
 const $pages = Array.from(document.querySelectorAll('.page'));
 const $existingCategories = document.getElementById('existing-categories');
 const $startGame = document.getElementById('start-game');
+const $startHatGame = document.getElementById('pull-name');
+const $nextRoundHatGame = document.getElementById('pull-next-name');
 const $categoryInpts = document.getElementById('category-inputs');
 const $readyButton = document.getElementById('ready-button');
+const $newNameSubmit = document.getElementById('new-hat-name-submit');
 const $games = {
   scattergories: {
     setup: document.getElementById('scattergories-setup'),
     round: document.getElementById('scattergories-game'),
   },
+  hatgame: {
+    setup: document.getElementById('hatgame-setup'),
+    round: document.getElementById('hatgame-game'),
+  }
 };
 
 const getRoomId = () => words[Math.floor(Math.random()*words.length)] + '-' + words[Math.floor(Math.random()*words.length)];
@@ -70,6 +78,9 @@ const setParticipantCount = (count) => {
 const setCategories = (categories) => {
   $existingCategories.innerHTML = categories.map(category => `<li>${category} <span data-category="${category}">X</span></li>`).join('');
 }
+const setNumberOfNames = (number) => {
+  document.getElementById('hat-game-name-count').innerText = `${number} names so far`;
+}
 const setCategoryInputs = (categories) => {
   $categoryInpts.innerHTML = categories.map(category => `
     <label for="${category}">${category}</label>
@@ -96,9 +107,12 @@ const wireUpGameChooser = () => {
 function init() {
   const [, dirtyRoomId] = window.location.pathname.split('/');
   console.log(dirtyRoomId);
+  $newNameSubmit.addEventListener('click', newName);
   $newCategorySubmit.addEventListener('click', newCategory);
   $existingCategories.addEventListener('click', removeCategory);
   $readyButton.addEventListener('click', ready);
+  $startHatGame.addEventListener('click', startHatGame);
+  $nextRoundHatGame.addEventListener('click', nextRoundHatGame);
   if(dirtyRoomId) {
     joinRoom(dirtyRoomId);
   } else {
@@ -110,6 +124,54 @@ function init() {
     $startGame.addEventListener('click', startGame);
   }
 }
+function showHatGameResults(progress){
+  hideAllElements();
+  document.getElementById('hatgame-results').style.display = 'block';
+  document.querySelector('#hatgame-results ul').innerHTML = Object
+    .keys(progress)
+    .map(x => `<li class="${progress[x]}">${x}</li>`)
+    .join('');
+}
+let names = [];
+const removeNameAndGetNext = () => {
+  if(names.length === 1) {
+    showHatGameResults(progress);
+    wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: true}));
+  } else {
+    const firstIndex = names.indexOf(nameEl.innerText);
+    names.splice(firstIndex, 1);
+    nameEl.innerText = names[Math.floor(Math.random() * names.length)];
+  }
+};
+const nameEl =document.getElementById('hatgame-name');
+const skipBtn = document.getElementById('hatgame-skip-button');
+const gotItBtn = document.getElementById('hatgame-done-button');
+let progress = {};
+skipBtn.addEventListener('click', () => {
+  progress[nameEl.innerText] = 'skipped';
+  removeNameAndGetNext();
+});
+gotItBtn.addEventListener('click', () => {
+  progress[nameEl.innerText] = 'got';
+  removeNameAndGetNext();
+});
+
+function showHatGameRound() {
+  showRound();
+
+  progress = {};
+
+  // Show 3s countdown to player
+  doCountdown(() => {
+    setTimeout(() => {
+      // Finish round
+      showHatGameResults(progress);
+      wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: false}));
+    }, 6000);
+
+    nameEl.innerText = names[Math.floor(Math.random() * names.length)];
+  });
+}
 function ready() {
   wsc.send(JSON.stringify({type:'scattergories-ready', connId, roomId}));
 }
@@ -117,6 +179,13 @@ function showRound() {
   $games[game].round.style.display = 'grid';
   $games[game].setup.style.display = 'none';
 }
+function nextRoundHatGame() {
+  document.getElementById('hatgame-name').innerText = "Name will appear here";
+  wsc.send(JSON.stringify({type:'hatgame-start', roomId}));
+}
+function startHatGame() {
+  wsc.send(JSON.stringify({type:'hatgame-start', roomId}));
+};
 function startGame() {
   wsc.send(JSON.stringify({type:'scattergories-start', roomId}));
 };
@@ -125,6 +194,12 @@ function removeCategory(e) {
     const { category } = e.target.dataset;
     wsc.send(JSON.stringify({type: 'scattergories-remove-category', roomId, category }))
   }
+}
+
+function newName () {
+  const name = $newNameInput.value;
+  $newNameInput.value = '';
+  wsc.send(JSON.stringify({ type: 'hatgame-add-name', roomId, name }));
 }
 
 function newCategory () {
@@ -175,11 +250,17 @@ function joinRoom(localRoomId) {
 
 var startTime;
 
+const $3 = document.getElementById('c3');
+const $2 = document.getElementById('c2');
+const $1 = document.getElementById('c1');
+const $go = document.getElementById('cgo');
+function resetCountdown() {
+  $3.classList.remove('counting');
+  $2.classList.remove('counting');
+  $1.classList.remove('counting');
+  $go.classList.remove('counting');
+}
 function doCountdown(callback) {
-  const $3 = document.getElementById('c3');
-  const $2 = document.getElementById('c2');
-  const $1 = document.getElementById('c1');
-  const $go = document.getElementById('cgo');
 
   $3.classList.add('counting');
 
@@ -190,6 +271,9 @@ function doCountdown(callback) {
       $1.classList.add('counting');
       setTimeout(() => {
         $go.classList.add('counting');
+        setTimeout(() => {
+          resetCountdown();
+        },3000);
         callback();
       }, 1000);
     }, 1000);
@@ -202,7 +286,6 @@ function startCountdown(callback) {
 }
 
 function updateState(state) {
-  console.log(state.readyCount)
   setParticipantCount(state.count);
   game = state.game;
   if(game === 'scattergories') {
@@ -216,6 +299,19 @@ function updateState(state) {
     } else {      
       showGame(game);
       if(state.categories) setCategories(state.categories);
+    }
+  } else {
+    if(state.status === 'playing') {
+      console.log('received playing message');
+      hideAllElements();
+    } else if(state.status === 'results') {
+      console.log('showing results...');
+      console.log(state.progress);
+      showHatGameResults(state.progress);
+    } else {
+      console.log('name update...');
+      showGame(game);
+      if(state.numberOfNames) setNumberOfNames(state.numberOfNames);
     }
   }
 }
@@ -248,6 +344,11 @@ wsc.onmessage = function (evt) {
       break;
     case 'state':
       updateState(signal);
+      break;
+    case 'hatgame-names':
+      names = signal.names;
+      showHatGameRound();
+      console.log('received names from server');
       break;
     default:
       console.log(signal);

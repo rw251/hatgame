@@ -218,7 +218,7 @@
 
   <div id="game-chooser" class="page">
     <h2>Which game?</h2>
-    <button data-game="hat" class="landing-page-button game-chooser">Who's in the hat?</button>
+    <button data-game="hatgame" class="landing-page-button game-chooser">Who's in the hat?</button>
     <button data-game="scattergories" class="landing-page-button game-chooser">Scattergories</button>
     <button data-game="exlibris" class="landing-page-button game-chooser">Ex libris (first line game)</button>
   </div>
@@ -226,6 +226,30 @@
   <div id="game-bar" class="page">
     <span id="room-link" class="hide"></span>
     <span id="people-counter">Participants: 1</span>
+  </div>
+
+  <div id="hatgame-setup" class="page">
+    <h1>Hat Game</h1>
+    <p>Enter some names. Can be real or fictional, dead or alive, famous or family. Try and put names of people that everyone will have heard of.</p>
+    <form class="input-with-button" onsubmit="return false">
+      <input id="new-hat-name-input" type="text" placeholder="Enter a name" />
+      <button id="new-hat-name-submit">+</button>
+    </form>
+    <div id="hat-game-name-count">0 names so far</div>
+    <button id="pull-name" class="landing-page-button">Pull a name from the hat</button>
+  </div>
+
+  <div id="hatgame-game" class="page">
+    <h1 id="hatgame-name">Name will appear here</h1>
+    <button id="hatgame-skip-button" class="landing-page-button">Skip</button>
+    <button id="hatgame-done-button" class="landing-page-button">Got it!</button>
+  </div>
+
+  <div id="hatgame-results" class="page">
+    <h1>Results</h1>
+    <ul>
+    </ul>
+    <button id="pull-next-name" class="landing-page-button">Pull a name from the hat</button>
   </div>
 
   <div id="scattergories-setup" class="page">
