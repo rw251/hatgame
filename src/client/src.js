@@ -304,6 +304,7 @@ function updateState(state) {
     if(state.status === 'playing') {
       console.log('received playing message');
       hideAllElements();
+      document.getElementById('hatgame-waiting').style.display = 'block';
     } else if(state.status === 'results') {
       console.log('showing results...');
       console.log(state.progress);
