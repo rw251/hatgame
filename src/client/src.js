@@ -124,17 +124,22 @@ function init() {
     $startGame.addEventListener('click', startGame);
   }
 }
-function showHatGameResults(progress){
+function showHatGameResults(progress, allCardsAreGone){
   hideAllElements();
   document.getElementById('hatgame-results').style.display = 'block';
   document.querySelector('#hatgame-results ul').innerHTML = Object
     .keys(progress)
     .map(x => `<li class="${progress[x]}">${x}</li>`)
     .join('');
+  if(allCardsAreGone) {
+    document.getElementById('hatgame-start-over').innerText = 'The hat was emptied. All the names are back in the hat.';
+  }
 }
 let names = [];
+let isStillPlaying = false;
 const removeNameAndGetNext = () => {
   if(names.length === 1) {
+    isStillPlaying = false;
     showHatGameResults(progress);
     wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: true}));
   } else {
@@ -161,12 +166,16 @@ function showHatGameRound() {
 
   progress = {};
 
+  isStillPlaying = true;
+
   // Show 3s countdown to player
   doCountdown(() => {
     setTimeout(() => {
       // Finish round
-      showHatGameResults(progress);
-      wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: false}));
+      if(isStillPlaying) {
+        showHatGameResults(progress, true);
+        wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: false}));
+      }
     }, 6000);
 
     nameEl.innerText = names[Math.floor(Math.random() * names.length)];
@@ -254,6 +263,7 @@ const $3 = document.getElementById('c3');
 const $2 = document.getElementById('c2');
 const $1 = document.getElementById('c1');
 const $go = document.getElementById('cgo');
+const $cd = document.getElementById('round-countdown');
 function resetCountdown() {
   $3.classList.remove('counting');
   $2.classList.remove('counting');
@@ -261,6 +271,8 @@ function resetCountdown() {
   $go.classList.remove('counting');
 }
 function doCountdown(callback) {
+
+  $cd.style.display = 'block';
 
   $3.classList.add('counting');
 
@@ -272,8 +284,9 @@ function doCountdown(callback) {
       setTimeout(() => {
         $go.classList.add('counting');
         setTimeout(() => {
+          $cd.style.display = 'block';
           resetCountdown();
-        },3000);
+        },1000);
         callback();
       }, 1000);
     }, 1000);
@@ -319,6 +332,7 @@ function updateState(state) {
 
 wsc.onmessage = function (evt) {
   const signal = JSON.parse(evt.data);
+  console.log(signal.type);
   switch (signal.type) {
     case 'id':
       connId = signal.connId;
@@ -350,6 +364,7 @@ wsc.onmessage = function (evt) {
       names = signal.names;
       showHatGameRound();
       console.log('received names from server');
+      console.log(names);
       break;
     default:
       console.log(signal);

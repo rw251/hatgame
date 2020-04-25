@@ -155,6 +155,7 @@ wss.on('connection', (ws) => {
   //connection is up, let's add a simple simple event
   ws.on('message', (message) => {
     const signal = JSON.parse(message);
+    console.log(signal.type, signal.roomId);
     switch(signal.type) {
       case 'join':
         joinRoom(connId, signal.roomId);
