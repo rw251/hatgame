@@ -29,7 +29,7 @@
     body {
       text-align: center;
       font-family: 'HelveticaNeue-Light','Helvetica Neue Light','Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif;
-      font-size: 16px;
+      font-size: 1.2rem;
       margin: 0;
     }    
     .page { 
@@ -37,7 +37,9 @@
       margin: 0 auto;
       width: 100%;
       justify-content: center;
-      /*position: fixed;*/
+    }
+    .page-narrow {
+      max-width: 600px;
     }
     .landing-page-button {
       font-size: 1.8rem;
@@ -51,13 +53,15 @@
       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       margin: 0.5rem;
-      width: 98vw;
       max-width: 500px;
       min-height: 50px;
       border-radius: 0.5rem;
       padding: 1em;
       position: relative;
       outline: none;
+    }
+    .full-width-button {
+      width: 98vw;
     }
 
     /* Pre-render the bigger shadow, but hide it */
@@ -165,7 +169,32 @@
       line-height: 30px;
     }
 
+    li.got {
+      color: darkgreen;
+      max-width: 400px;
+      margin: 0 auto; 
+      font-weight: bold;
+      text-align: left;
+    }
+
+    li.got:before {
+      content: '✓ ';
+    }
+
+    li.skipped {
+      color: #555;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    li.skipped:before {
+      content: '✗ '
+    }
+
     .host-only {
+      display: none;
+    }
+    .guest-only {
       display: none;
     }
     #round-countdown {
@@ -212,37 +241,39 @@
   </div>
   <div id="landing-buttons" class="page">
     <h2>Games</h2>
-    <button id="hostBtn" class="landing-page-button">Host a new game</button>
-    <button id="joinBtn" class="landing-page-button">Join an existing game</button>
+    <button id="hostBtn" class="landing-page-button full-width-button">Host a new game</button>
+    <button id="joinBtn" class="landing-page-button full-width-button">Join an existing game</button>
   </div>
 
   <div id="game-chooser" class="page">
     <h2>Which game?</h2>
-    <button data-game="hatgame" class="landing-page-button game-chooser">Who's in the hat?</button>
-    <button data-game="scattergories" class="landing-page-button game-chooser">Scattergories</button>
-    <button data-game="exlibris" class="landing-page-button game-chooser">Ex libris (first line game)</button>
+    <button data-game="hatgame" class="landing-page-button full-width-button game-chooser">Who's in the hat?</button>
+    <button data-game="scattergories" class="landing-page-button full-width-button game-chooser">Scattergories</button>
+    <button data-game="exlibris" class="landing-page-button full-width-button game-chooser">Ex libris (first line game)</button>
   </div>
 
   <div id="game-bar" class="page">
     <span id="room-link" class="hide"></span>
     <span id="people-counter">Participants: 1</span>
   </div>
-
-  <div id="hatgame-setup" class="page">
+ 
+  <div id="hatgame-setup" class="page page-narrow">
     <h1>Hat Game</h1>
     <p>Enter some names. Can be real or fictional, dead or alive, famous or family. Try and put names of people that everyone will have heard of.</p>
     <form class="input-with-button" onsubmit="return false">
       <input id="new-hat-name-input" type="text" placeholder="Enter a name" />
       <button id="new-hat-name-submit">+</button>
     </form>
-    <div id="hat-game-name-count">0 names so far</div>
-    <button id="pull-name" class="landing-page-button">Pull a name from the hat</button>
+    <div id="hat-game-name-count" style="font-weight: bold;">0 names so far</div>
+    <p class="host-only">When you've got enough names you can...</p>
+    <button id="start-hatgame" class="landing-page-button full-width-button host-only">Start the game</button>
+    <p class="guest-only">The game will start when the host starts the game.</p>
   </div>
 
-  <div id="hatgame-game" class="page">
-    <h1 id="hatgame-name">Name will appear here</h1>
-    <button id="hatgame-skip-button" class="landing-page-button">Skip</button>
-    <button id="hatgame-done-button" class="landing-page-button">Got it!</button>
+  <div id="hatgame-game" class="page" style="grid-template-columns: 1fr 1fr;">
+    <h1 id="hatgame-name" style="grid-column-start: 1;grid-column-end:3;">Name will appear here</h1>
+    <button id="hatgame-skip-button" disabled class="landing-page-button" style="background: #a0b0cb">Oops - made a mistake</button>
+    <button id="hatgame-done-button" disabled class="landing-page-button">They got it!</button>
   </div>
 
   <div id="hatgame-waiting" class="page">
@@ -253,8 +284,8 @@
     <h1>Results</h1>
     <ul>
     </ul>
-    <div id="hatgame-start-over"></div>
-    <button id="pull-next-name" class="landing-page-button">Pull a name from the hat</button>
+    <div id="hatgame-start-over" style="margin: 20px 0;"></div>
+    <button id="pull-next-name" class="landing-page-button full-width-button">Pull a name from the hat</button>
   </div>
 
   <div id="scattergories-setup" class="page">
@@ -266,13 +297,13 @@
     <ul id="existing-categories">
       <li>Currently no categories - add some in the box above...</li>
     </ul>
-    <button id="start-game" class="landing-page-button host-only">Start game</button>
+    <button id="start-game" class="landing-page-button full-width-button host-only">Start game</button>
   </div>
   
   <div id="scattergories-game" class="page">
     <h2>A round</h2>
     <form id="category-inputs" class="category-inputs" onsubmit="return false"></form>
-    <button id="ready-button" class="landing-page-button">I'm ready</button>
+    <button id="ready-button" class="landing-page-button full-width-button">I'm ready</button>
   </div>
 
   <div id="join-dialog" class="page">

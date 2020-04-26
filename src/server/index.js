@@ -125,6 +125,9 @@ const endHatGameRound = (roomId, progress, isDeckEmpty) => {
   if(namesLeft === 0) {
     rooms[roomId].names = rooms[roomId].doneNames;
     rooms[roomId].doneNames = [];
+    rooms[roomId].state.allGone = true;
+  } else {
+    rooms[roomId].state.allGone = false;
   }
   rooms[roomId].state.namesLeft = rooms[roomId].names.length;
   rooms[roomId].state.progress = progress;
