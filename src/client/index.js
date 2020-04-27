@@ -198,7 +198,7 @@ function showHatGameRound() {
         isPlayer = false;
         wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: false}));
       }
-    }, 60000);
+    }, 30000);
 
     // enabled buttons
     skipBtn.removeAttribute('disabled');
