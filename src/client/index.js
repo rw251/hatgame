@@ -9,6 +9,7 @@ let connId;
 let roomId;
 let game;
 let isHost = false;
+let isPlayer = false;
 
 const unambiguousLetters = ['a','b','c','d','e','f','g','h','k','m','n','p','q','r','s','t','u','v','w','x','y','z'];
 const $landingButtons = document.getElementById('landing-buttons');
@@ -148,6 +149,7 @@ let isStillPlaying = false;
 const removeNameAndGetNext = () => {
   if(names.length === 1) {
     isStillPlaying = false;
+    isPlayer = false;
     showHatGameResults(progress);
     wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: true}));
   } else {
@@ -193,6 +195,7 @@ function showHatGameRound() {
       // Finish round
       if(isStillPlaying) {
         showHatGameResults(progress, true);
+        isPlayer = false;
         wsc.send(JSON.stringify({type:'hatgame-round-ends', roomId, progress, isDeckEmpty: false}));
       }
     }, 60000);
@@ -211,6 +214,8 @@ function showRound() {
   $games[game].setup.style.display = 'none';
 }
 function nextRoundHatGame() {
+  isPlayer = true;
+  hideAllElements();
   document.getElementById('hatgame-name').innerText = "Name will appear here";
   wsc.send(JSON.stringify({type:'hatgame-start', roomId}));
 }
@@ -231,7 +236,9 @@ function removeCategory(e) {
 function newName () {
   const name = $newNameInput.value;
   $newNameInput.value = '';
-  wsc.send(JSON.stringify({ type: 'hatgame-add-name', roomId, name }));
+  if(name.length >= 2) {
+    wsc.send(JSON.stringify({ type: 'hatgame-add-name', roomId, name }));
+  }
 }
 
 function newCategory () {
@@ -343,8 +350,10 @@ function updateState(state) {
   } else {
     if(state.status === 'playing') {
       console.log('received playing message');
-      hideAllElements();
-      document.getElementById('hatgame-waiting').style.display = 'block';
+      if(!isPlayer) {
+        hideAllElements();
+        document.getElementById('hatgame-waiting').style.display = 'block';
+      }
     } else if(state.status === 'results') {
       console.log('showing results...');
       console.log(state.progress);
@@ -363,26 +372,6 @@ wsc.onmessage = function (evt) {
   switch (signal.type) {
     case 'id':
       connId = signal.connId;
-      console.log(connId);
-      break;
-    case 'ice':
-      $remoteVideos[signal.remoteId].peerConnection.addIceCandidate(new RTCIceCandidate(signal.candidate));
-      break;
-    case 'offer':
-      initiatePeerConnection(signal.remoteId)
-        .then(() => $remoteVideos[signal.remoteId].peerConnection.setRemoteDescription(new RTCSessionDescription(signal.offer)))
-        .then(() => $remoteVideos[signal.remoteId].peerConnection.createAnswer())
-        .then(answer => $remoteVideos[signal.remoteId].peerConnection.setLocalDescription(answer))
-        .then(() => wsc.send(JSON.stringify({type: 'answer', remoteId: signal.remoteId, answer: $remoteVideos[signal.remoteId].peerConnection.localDescription})));
-      break;
-    case 'answer':
-      $remoteVideos[signal.remoteId].peerConnection.setRemoteDescription(new RTCSessionDescription(signal.answer));
-      break;
-    case 'newMember':
-      initiatePeerConnectionAndSendOffer(signal.id);
-      break;
-    case 'participantList':
-      initiatePeerConnectionAndSendOffers(signal.participants);
       break;
     case 'state':
       updateState(signal);
@@ -390,8 +379,6 @@ wsc.onmessage = function (evt) {
     case 'hatgame-names':
       names = signal.names;
       showHatGameRound();
-      console.log('received names from server');
-      console.log(names);
       break;
     default:
       console.log(signal);
