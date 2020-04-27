@@ -1,3 +1,4 @@
+import copy from 'rollup-plugin-copy'
 import rimraf from 'rimraf';
 import { join } from 'path';
 import { terser } from 'rollup-plugin-terser';
@@ -47,11 +48,11 @@ function buildConfig({ watch, isProduction } = {}) {
       // babel({ exclude: 'node_modules/**' }),
       !isDev && terser(), // uglify the code if not dev mode
       createHTMLPlugin({ isDev, rollbarClientToken }), // create the index.html
-      // copy({
-      //   targets: [
-      //     { src: 'src/static/*', dest: distDir, dot: true },
-      //   ],
-      // }),
+      copy({
+        targets: [
+          { src: 'src/client/static/*', dest: distDir, dot: true },
+        ],
+      }),
       // createServiceWorkerPlugin(),
       // createNumberSolverWorkerPlugin(),
       isProduction && rollbarSourcemaps({
