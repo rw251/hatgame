@@ -10,7 +10,7 @@ const port = process.env.PORT || 3091;
 const app = express();
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(express.static(path.join(__dirname, '..', 'client')));
+app.use(express.static(path.join(__dirname, '..', '..', 'public_html')));
 
 if (process.env.NODE_ENV === 'production') {
   console.log('ATTEMPTING FORCESSL');
@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === 'production') {
 app.enable('trust proxy');
 
 app.get('*', function(req, res){
-  res.sendFile(path.join(__dirname, '..', 'client', 'index.html'))
+  res.sendFile(path.join(__dirname, '..', '..', 'public_html', 'index.html'))
 });
 
 const wsClients = {};

@@ -267,7 +267,6 @@ function joinRoom(localRoomId) {
     }, 10);
   }
 
-  
   document.querySelectorAll('.guest-only').forEach(el => el.classList.remove('guest-only'));
 
   roomId = typeof(localRoomId) === 'string'
