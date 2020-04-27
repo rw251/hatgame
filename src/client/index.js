@@ -88,7 +88,6 @@ const setCategoryInputs = (categories) => {
     <input type="text" />`
   ).join('');
 }
-
 const showGame = (game) => {
   $games[game].setup.style.display = 'block';
 

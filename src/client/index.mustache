@@ -54,7 +54,7 @@
       border: 0;
       box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
       cursor: pointer;
-      margin: 0.5rem;
+      margin: 0.5rem 0;
       max-width: 500px;
       min-height: 50px;
       border-radius: 0.5rem;
@@ -103,18 +103,6 @@
       padding: 0 5px;
       flex-grow: 1;
     }
-    @media (max-width: 578px) {
-      #game-bar span {
-        font-size: 1.2rem;
-      }
-      h1 {
-        margin: 2px 0;
-      }
-      p {        
-        margin: 2px 0;
-        font-size: 1rem;
-      }
-    }
     #people-counter {
       background: purple;
       color: white;
@@ -135,7 +123,8 @@
       line-height: 4rem;
       border: 1px solid grey;
       float: left;
-      width: 80%;
+      width: calc(80% - 2px);
+      margin-left: 2px;
       border-radius: 10px 0 0 10px;
       outline: none;
     }
@@ -150,7 +139,7 @@
     }
     form.input-with-button button {
       float: left;
-      width: 20%;
+      width: calc(20% - 2px);
       padding: 10px;
       background: #2196F3;
       color: white;
@@ -161,6 +150,7 @@
       cursor: pointer;
       border-radius: 0 10px 10px 0;
       outline: none;
+      margin-right: 2px;
     }
 
     form.input-with-button button:hover {
@@ -243,6 +233,29 @@
     }    
     #round-countdown div.counting {
       animation: pulse 1s forwards;
+    }
+    @media (max-width: 578px) {
+      #game-bar span {
+        font-size: 1.2rem;
+        line-height: 1.5rem;
+      }
+      form.input-with-button input[type=text] {
+        line-height: 2.5rem;
+      }
+      form.input-with-button button {
+        line-height: 2.5rem;
+      }
+      h1 {
+        font-size: 1.5em;
+        margin: 2px 0;
+      }
+      p {        
+        margin: 2px 0;
+        font-size: 1rem;
+      }
+      .landing-page-button {        
+        padding: 0.3em;
+      }
     }
   </style>
     {{#isProduction}}
