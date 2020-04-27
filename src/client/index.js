@@ -186,7 +186,7 @@ function showHatGameRound() {
   showRound();
 
   progress = {};
-
+  
   isStillPlaying = true;
 
   // Show 3s countdown to player
