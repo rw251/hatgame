@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 // we truxt the x-forwarded--blah header and req.secure is true
 if (process.env.NODE_ENV === 'production') {
   console.log('Production and heroku so lets do some http to https redirects');
-  app.enable('trust proxy'); 
+  app.enable('trust proxy');
   app.use((req, res, next) => {
     if (req.secure) {
       next();
