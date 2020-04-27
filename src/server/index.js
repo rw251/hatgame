@@ -9,7 +9,6 @@ const port = process.env.PORT || 3091;
 const app = express();
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(express.static(path.join(__dirname, '..', '..', 'public_html')));
 
 // for heroku we are behind a proxy so req.secure is false as
 // the internal traffic is http. If we "trust the proxy", then
@@ -25,6 +24,8 @@ if (process.env.NODE_ENV === 'production') {
     }
   });
 }
+
+app.use(express.static(path.join(__dirname, '..', '..', 'public_html')));
 
 app.get('*', function(req, res){
   res.sendFile(path.join(__dirname, '..', '..', 'public_html', 'index.html'))
