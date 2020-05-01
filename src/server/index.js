@@ -112,7 +112,7 @@ const readyScattergories = (participantId, roomId) => {
 const startHatGame = (roomId, connId) => {
   rooms[roomId].state.status = 'playing';
   updateState(roomId);
-  wsClients[connId].ws.send(JSON.stringify({type:'hatgame-names', names: rooms[roomId].names}));
+  wsClients[connId].ws.send(JSON.stringify({type:'state', status:'names', names: rooms[roomId].names}));
 }
 const addName = (roomId, name) => {
   if(!rooms[roomId].names) rooms[roomId].names = [];
@@ -206,8 +206,6 @@ wss.on('connection', (ws) => {
     leaveAllRooms(connId);
   });
 
-  //send immediatly a feedback to the incoming connection    
-  ws.send(JSON.stringify({type: 'id', connId}));
 });
 
 server.listen(port, err => {
