@@ -24,6 +24,12 @@ const initWebSocket = () => {
     isWebSocketOpen = true;
   };
 
+  wsc.onclose = () => {
+    window.location.reload();
+  }
+
+  wsc.on
+
   return { wsc };
 };
 
