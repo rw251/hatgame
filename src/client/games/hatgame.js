@@ -95,7 +95,7 @@ const showRound = (namesToPlay) => {
         isPlayer = false;
         sendMessage({type:'hatgame-round-ends', progress, isDeckEmpty: false});
       }
-    }, 3000);
+    }, 30000);
 
     // enabled buttons
     $skipBtn.removeAttribute('disabled');
