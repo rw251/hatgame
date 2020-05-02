@@ -1,6 +1,6 @@
 import { hideAllElements } from '../scripts/main';
 import { createRoom } from '../scripts/room-management';
-import { showHostingBar, setRoomLink, setParticipantCount } from './game-bar';
+import { showGameBar, setRoomLink, setParticipantCount } from './game-bar';
 import { hatgame } from '../games/hatgame';
 import { scattergories } from '../games/scattergories';
 import { exlibris } from '../games/exlibris';
@@ -12,12 +12,6 @@ const $games = {
   hatgame,
   exlibris,
 };
-
-function showRound(state) {
-  $games[game].round.style.display = 'grid';
-  $games[game].setup.style.display = 'none';
-  $games[game].showRound(state);
-}
 
 let game;
 
@@ -41,7 +35,7 @@ const wireUpGameChooser = () => {
     $game.addEventListener('click', async (e) => {
       game = $game.dataset.game;
       document.querySelectorAll('.host-only').forEach(el => el.classList.remove('host-only'));
-      showHostingBar();
+      showGameBar();
       showGame({ game });
       const roomId = createRoom(game);      
       setRoomLink(roomId);

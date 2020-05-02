@@ -281,12 +281,14 @@
   {{/isProduction}}
 </head>
 <body>
+
   <div id="round-countdown" style="display: none;">
     <div id="c3">3</div>
     <div id="c2">2</div>
     <div id="c1">1</div>
     <div id="cgo">Go!</div>
   </div>
+
   <div id="landing-buttons" class="page">
     <h2>Games</h2>
     <button id="hostBtn" class="landing-page-button full-width-button">Host a new game</button>
@@ -298,6 +300,13 @@
     <button data-game="hatgame" class="landing-page-button full-width-button game-chooser">Who's in the hat?</button>
     <button data-game="scattergories" disabled class="landing-page-button full-width-button game-chooser">Scattergories</button>
     <button data-game="exlibris" disabled class="landing-page-button full-width-button game-chooser">Ex libris (first line game)</button>
+  </div>
+
+  <div id="join-dialog" class="page">
+    <form class="input-with-button" onsubmit="return false">
+      <input id="join-room-input" type="text" placeholder="Enter the room name" />
+      <button id="join-submit">🡆</button>
+    </form>
   </div>
 
   <div id="game-bar" class="page">
@@ -319,13 +328,13 @@
   </div>
 
   <div id="hatgame-game" class="page" style="grid-template-columns: 1fr 1fr;padding-top:40px">
-    <h1 id="hatgame-name" style="grid-column-start: 1;grid-column-end:3;">Name will appear here</h1>
+    <h1 id="hatgame-name" style="grid-column-start: 1;grid-column-end:3;">A name will appear here</h1>
     <button id="hatgame-skip-button" disabled class="landing-page-button" style="background: #a0b0cb">Oops - made a mistake</button>
     <button id="hatgame-done-button" disabled class="landing-page-button">They got it!</button>
   </div>
 
   <div id="hatgame-waiting" class="page">
-    <h1>Guess the name!</h1>
+    <h1>A round is in progress - try and guess the name!</h1>
   </div>
 
   <div id="hatgame-results" class="page">
@@ -333,6 +342,7 @@
     <ul>
     </ul>
     <div id="hatgame-start-over" style="margin: 20px 0;"></div>
+    <p>If it's your turn, you can...</p>
     <button id="pull-next-name" class="landing-page-button full-width-button">Pull a name from the hat</button>
   </div>
 
@@ -352,13 +362,6 @@
     <h2>A round</h2>
     <form id="category-inputs" class="category-inputs" onsubmit="return false"></form>
     <button id="ready-button" class="landing-page-button full-width-button">I'm ready</button>
-  </div>
-
-  <div id="join-dialog" class="page">
-    <form class="input-with-button" onsubmit="return false">
-      <input id="join-room-input" type="text" placeholder="Enter the room name" />
-      <button id="join-submit">🡆</button>
-    </form>
   </div>
 
   <script src="/{{ scriptFile }}"></script>

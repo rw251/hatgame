@@ -1,6 +1,6 @@
 import { hideAllElements } from '../scripts/main';
 import { joinRoom } from '../scripts/room-management';
-import { showParticipantBar } from './game-bar';
+import { showGameBar, setRoomLink } from './game-bar';
 
 const $joinDialog = document.getElementById('join-dialog');
 const $joinRoomInput = document.getElementById('join-room-input');
@@ -15,7 +15,8 @@ const wireUpJoinPage = () => {
   $joinSubmit.addEventListener('click', () => {
     const roomId = getCleanRoomId($joinRoomInput.value);
     joinRoom(roomId);
-    showParticipantBar();
+    setRoomLink(roomId);
+    showGameBar();
   });
 }
 

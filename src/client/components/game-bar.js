@@ -7,13 +7,9 @@ const $peopleCounter = document.getElementById('people-counter');
 const setParticipantCount = (count) => {
   $peopleCounter.innerText = `Participants: ${count}`;
 }
-const showHostingBar = () => {
+const showGameBar = () => {
   hideAllElements();
   $roomLink.classList.remove('hide');
-  $gameBar.style.display = 'flex';
-}
-const showParticipantBar = () => {
-  hideAllElements();
   $gameBar.style.display = 'flex';
 }
 const setRoomLink = (id) => {
@@ -21,8 +17,7 @@ const setRoomLink = (id) => {
 };
 
 export {
-  showHostingBar,
-  showParticipantBar,
+  showGameBar,
   setRoomLink,
   setParticipantCount,
 }
