@@ -59,6 +59,9 @@ function showHatGameResults(progress, allCardsAreGone){
       .keys(progress)
       .map(x => `<li class="${progress[x]}">${x}</li>`)
       .join('');
+    if(Object.keys(progress).length === 0) {
+      $resultsList.innerHTML = '<li>You didn\'t get any. Better luck next time!</li>';
+    }
     if(allCardsAreGone) {
       $goAgainBtn.innerText = 'The hat was emptied. All the names are back in the hat.';
     } else {
@@ -92,7 +95,7 @@ const showRound = (namesToPlay) => {
         isPlayer = false;
         sendMessage({type:'hatgame-round-ends', progress, isDeckEmpty: false});
       }
-    }, 30000);
+    }, 3000);
 
     // enabled buttons
     $skipBtn.removeAttribute('disabled');
