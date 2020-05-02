@@ -27,6 +27,11 @@ const showGame = ({ game, ...state}) => {
 };
 
 const showGameChooser = () => {
+  // update url if not already
+  const newUrl = '/host';
+  if(window.location.pathname !== newUrl) {
+    window.history.pushState(null, null, newUrl);
+  }
   hideAllElements();
   $gameChooser.style.display = 'grid';
 }

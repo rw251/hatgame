@@ -1,28 +1,48 @@
 import { joinRoom } from './scripts/room-management';
 import { initWebSocket } from './scripts/web-sockets';
-import { showLandingButtons } from './components/landing-page';
+import { showLandingButtons, wireUpLandingButtons } from './components/landing-page';
 import { showParticipantBar } from './components/game-bar';
-import { updateGameState } from './components/game-chooser';
-import { wireUpJoinPage } from './components/join-page';
+import { updateGameState, showGameChooser, wireUpGameChooser } from './components/game-chooser';
+import { wireUpJoinPage, showJoinDialog } from './components/join-page';
 import { initializeHatGame } from './games/hatgame';
 import { initializeScattergories } from './games/scattergories';
 
 const { wsc } = initWebSocket();
 
-function init() {
-  const [, roomId] = window.location.pathname.split('/');
-  console.log(roomId);
+wireUpLandingButtons();
+wireUpGameChooser();
+wireUpJoinPage();
   
-  initializeHatGame();
-  initializeScattergories();
+initializeHatGame();
+initializeScattergories();
+
+const displayPage = (pathname) => {
+  // / - landing page
+  // /host - host a new game
+  // /join - join a new game
+  // /sadfsd - a room
+
+  const [, roomId] = pathname.split('/');
+  console.log(roomId);
  
-  if(roomId) {
+  if(!roomId) {
+    showLandingButtons();
+  } else if(roomId === 'host') {
+    showGameChooser();
+  } else if (roomId === 'join') {
+    showJoinDialog();
+  } else {
     joinRoom(roomId);
     showParticipantBar();
-  } else {
-    showLandingButtons();
-    wireUpJoinPage();
   }
+}
+
+window.onpopstate = () => {
+  displayPage(document.location.pathname);
+};
+
+function init() {
+  displayPage(window.location.pathname);  
 }
 
 wsc.onmessage = function (evt) {

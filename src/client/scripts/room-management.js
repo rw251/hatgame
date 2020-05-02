@@ -1,7 +1,13 @@
 import { createRoomOnServer, joinRoomOnServer } from './web-sockets';
 
 const createRoom = (game) => {
-  return createRoomOnServer(game);
+  const roomId = createRoomOnServer(game);
+  // update url if not already
+  const newUrl = `/${roomId}`;
+  if(window.location.pathname !== newUrl) {
+    window.history.pushState(null, null, newUrl);
+  }
+  return roomId;
 }
 
 const joinRoom = (localRoomId) => {

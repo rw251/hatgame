@@ -19,7 +19,13 @@ const wireUpJoinPage = () => {
   });
 }
 
-const showJoinDialog = () => {
+const showJoinDialog = () => {  
+  // update url if not already
+  const newUrl = '/join';
+  if(window.location.pathname !== newUrl) {
+    window.history.pushState(null, null, newUrl);
+  }
+
   hideAllElements();
   $joinDialog.style.display = 'block';
   $joinRoomInput.focus();
