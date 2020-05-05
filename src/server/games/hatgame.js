@@ -1,5 +1,4 @@
-const { send } = require('../sockets.js');
-const { broadcastState, getRoom } = require('../rooms.js');
+const { broadcastState, send, getRoom } = require('../rooms.js');
 
 const startHatGame = (roomId, connId) => {
   const room = getRoom(roomId);

@@ -7,12 +7,8 @@ const hatgame = require('./games/hatgame.js');
 const scattergories = require('./games/hatgame.js');
 
 const { 
-  createRoom, 
-  joinRoom,
-  leaveAllRooms,
-  initRoomManagement,
+  initializeRooms,
 } = require('./rooms.js');
-const { initWebSocket } = require('./sockets.js');
 
 const port = process.env.PORT || 3091;
 
@@ -46,7 +42,7 @@ const games = {
   hatgame,
 };
 
-initWebSocket({ server, games, createRoom, joinRoom, leaveAllRooms });
+initializeRooms({ server, games });
 
 server.on('request', app);
 
