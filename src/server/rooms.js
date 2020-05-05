@@ -77,7 +77,11 @@ exports.initializeRooms = ({server, games}) => {
     //connection is up, let's add a simple simple event
     ws.on('message', (message) => {
       const signal = JSON.parse(message);
+      signal.connId = connId;
       console.log(signal.type, signal.roomId);
+
+      let isHandled = true;
+      // Room management
       switch(signal.type) {
         case 'join':
           joinRoom(connId, signal.roomId);
@@ -85,30 +89,18 @@ exports.initializeRooms = ({server, games}) => {
         case 'host':
           createRoom(connId, signal.roomId, signal.game);
           break;
-        case 'hatgame-round-ends':
-          games.hatgame.endround(signal.roomId, signal.progress, signal.isDeckEmpty);
-          break;
-        case 'hatgame-add-name':
-          games.hatgame.addName(signal.roomId, signal.name);
-          break;
-        case 'hatgame-start':
-          games.hatgame.start(signal.roomId, connId);
-          break;
-        case 'scattergories-add-category':
-          games.scattergories.addCategory(signal.roomId, signal.category);
-          break;
-        case 'scattergories-remove-category':
-          games.scattergories.removeCategory(signal.roomId, signal.category);
-          break;
-        case 'scattergories-start':
-          games.scattergories.start(signal.roomId, connId);
-          break;
-        case 'scattergories-ready':
-          games.scattergories.ready(connId, signal.roomId);
-          break;
         default:
-          console.log(signal);
+          isHandled = false;
       }
+
+      if(!isHandled) {
+        if(!signal.game || !games[signal.game] || !games[signal.game][signal.type]) {
+          console.log(signal);
+        } else {
+          games[signal.game][signal.type](signal);
+        }
+      }
+
     });
 
     ws.on('close', () => {

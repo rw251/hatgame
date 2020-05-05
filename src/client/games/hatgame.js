@@ -27,7 +27,7 @@ const removeNameAndGetNext = () => {
     isStillPlaying = false;
     isPlayer = false;
     showHatGameResults(progress);
-    sendMessage({type:'hatgame-round-ends', progress, isDeckEmpty: true});
+    sendMessage({type:'endRound', game: 'hatgame', progress, isDeckEmpty: true});
   } else {
     const firstIndex = names.indexOf($nameEl.innerText);
     names.splice(firstIndex, 1);
@@ -44,7 +44,7 @@ const newName = () => {
   const name = $newNameInput.value;
   $newNameInput.value = '';
   if(name.length >= 2) {
-    sendMessage({ type: 'hatgame-add-name', name });
+    sendMessage({ type: 'addName', game: 'hatgame', name });
   }
 }
 
@@ -93,7 +93,7 @@ const showRound = (namesToPlay) => {
       if(isStillPlaying) {
         showHatGameResults(progress, true);
         isPlayer = false;
-        sendMessage({type:'hatgame-round-ends', progress, isDeckEmpty: false});
+        sendMessage({type:'endRound', game: 'hatgame', progress, isDeckEmpty: false});
       }
     }, 25000);
 
@@ -105,14 +105,14 @@ const showRound = (namesToPlay) => {
 }
 
 const startHatGame = () => {
-  sendMessage({type:'hatgame-round-ends', progress: {firstRound:true}, isDeckEmpty: false});
+  sendMessage({type:'endRound', game: 'hatgame', progress: {firstRound:true}, isDeckEmpty: false});
 };
 
 const nextRoundHatGame = () => {
   isPlayer = true;
   hideAllElements();
   $name.innerText = "Name will appear here";
-  sendMessage({type:'hatgame-start'});
+  sendMessage({type:'start', game:'hatgame'});
 }
 
 const skipName = () => {

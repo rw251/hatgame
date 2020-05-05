@@ -10,11 +10,11 @@ const $categoryInputs = document.getElementById('category-inputs');
 const $setupEl = document.getElementById('scattergories-setup');
 
 const startGame = () => {
-  sendMessage({type:'scattergories-start'});
+  sendMessage({type:'start', game: 'scattergories' });
 };
 
 const ready = () => {
-  sendMessage({type:'scattergories-ready'});
+  sendMessage({type:'ready', game: 'scattergories' });
 }
 
 const initializeScattergories = () => {
@@ -27,13 +27,13 @@ const initializeScattergories = () => {
 const newCategory = () => {
   const category = $newCategoryInput.value;
   $newCategoryInput.value = '';
-  sendMessage({ type: 'scattergories-add-category', category });
+  sendMessage({ type: 'addCategory', game: 'scattergories', category });
 }
 
 const removeCategory = (e) => {
   if(e.target.tagName.toLowerCase() === 'span') {
     const { category } = e.target.dataset;
-    sendMessage({type: 'scattergories-remove-category', category })
+    sendMessage({type: 'removeCategory', game: 'scattergories', category })
   }
 }
 

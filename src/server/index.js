@@ -4,7 +4,12 @@ const server = require('http').createServer();
 const path = require('path');
 
 const hatgame = require('./games/hatgame.js');
-const scattergories = require('./games/hatgame.js');
+const scattergories = require('./games/scattergories.js');
+
+const games = {
+  scattergories,
+  hatgame,
+};
 
 const { 
   initializeRooms,
@@ -36,11 +41,6 @@ app.use(express.static(path.join(__dirname, '..', '..', 'public_html')));
 app.get('*', function(req, res){
   res.sendFile(path.join(__dirname, '..', '..', 'public_html', 'index.html'))
 });
-
-const games = {
-  scattergories,
-  hatgame,
-};
 
 initializeRooms({ server, games });
 

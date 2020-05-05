@@ -1,12 +1,12 @@
 const { broadcastState, send, getRoom } = require('../rooms.js');
 
-const startHatGame = (roomId, connId) => {
+const start = ({roomId, connId}) => {
   const room = getRoom(roomId);
   room.state.status = 'playing';
   broadcastState(roomId);
   send({type:'state', status:'names', names: room.names}, connId);
 }
-const addName = (roomId, name) => {
+const addName = ({roomId, name}) => {
   const room = getRoom(roomId);
   if(!room.names) room.names = [];
   room.names.push(name);
@@ -14,7 +14,7 @@ const addName = (roomId, name) => {
   broadcastState(roomId);
 }
 
-const endHatGameRound = (roomId, progress, isDeckEmpty) => {
+const endRound = ({roomId, progress, isDeckEmpty}) => {
   const room = getRoom(roomId);
   room.state.status = 'results';
   if(!room.doneNames) room.doneNames = [];
@@ -37,6 +37,6 @@ const endHatGameRound = (roomId, progress, isDeckEmpty) => {
 
 module.exports = {
   addName,
-  start: startHatGame,
-  endround: endHatGameRound,
+  start,
+  endRound,
 };
