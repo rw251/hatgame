@@ -28,8 +28,6 @@ const initWebSocket = () => {
     window.location.reload();
   }
 
-  wsc.on
-
   return { wsc };
 };
 
@@ -63,9 +61,21 @@ const sendMessage = (message) => {
   wsc.send(JSON.stringify({ roomId, ...message }));
 }
 
+const admin = () => {
+
+  if(!isWebSocketOpen) {
+    return setTimeout(() => {
+      admin();
+    }, 10);
+  }
+
+  wsc.send(JSON.stringify({ type: 'admin' }));  
+}
+
 export {
   initWebSocket,
   createRoomOnServer,
   joinRoomOnServer,
   sendMessage,
+  admin,
 }

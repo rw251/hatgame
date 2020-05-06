@@ -32,7 +32,15 @@ const showJoinDialog = () => {
   $joinRoomInput.focus();
 }
 
+const showNoRoom = (roomId) => {
+  hideAllElements();
+  alert(`The roomId of "${roomId}" is wrong - please check and try again.`);
+  $joinDialog.style.display = 'block';
+  $joinRoomInput.focus();
+}
+
 export {
   showJoinDialog,
   wireUpJoinPage,
+  showNoRoom,
 }

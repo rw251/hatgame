@@ -6,6 +6,7 @@ const start = ({roomId, connId}) => {
   broadcastState(roomId);
   send({type:'state', status:'names', names: room.names}, connId);
 }
+
 const addName = ({roomId, name}) => {
   const room = getRoom(roomId);
   if(!room.names) room.names = [];

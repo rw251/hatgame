@@ -7,11 +7,11 @@ const id = () => Math.floor(Math.random()*10000000000);
 const rooms = {};
 
 const broadcast = (message, people) => {
-  people.forEach(person => wsClients[person].ws.send(JSON.stringify(message)));
+  people.forEach(person => wsClients[person].webSocket.send(JSON.stringify(message)));
 };
 
 const send = (message, person) => {
-  wsClients[person].ws.send(JSON.stringify(message));
+  wsClients[person].webSocket.send(JSON.stringify(message));
 };
 
 const disconnect = (participantId) => {
@@ -48,7 +48,7 @@ const leaveRoom = (participantId, roomId) => {
   broadcastState(roomId);
 };
 
-const leaveAllRooms = (participantId) => {
+const leaveAllRooms = (participantId) => () => {
   getRoomsFor(participantId).forEach(roomId => leaveRoom(participantId, roomId));
   disconnect(participantId);
 }
@@ -64,50 +64,51 @@ const joinRoom = (participantId, roomId) => {
   broadcastState(cleanRoomId);
 };
 
-exports.initializeRooms = ({server, games}) => {
-  const wss = new WebSocketServer({ server });
-  
-  wss.on('connection', (ws) => {
+const listRooms = (participantId) => send({ type: 'admin', ...rooms}, participantId);
 
-    const connId = id();
-    console.log('connection up', connId);
+const initializeClient = (games) => (webSocket) => {
+  const connId = id();
 
-    wsClients[connId] = { ws, rooms: [] };
+  wsClients[connId] = { webSocket, rooms: [] };
 
-    //connection is up, let's add a simple simple event
-    ws.on('message', (message) => {
-      const signal = JSON.parse(message);
-      signal.connId = connId;
-      console.log(signal.type, signal.roomId);
+  webSocket.on('message', (message) => {
+    const signal = JSON.parse(message);
+    signal.connId = connId;
+    console.log(signal.type, signal.roomId);
 
-      let isHandled = true;
-      // Room management
-      switch(signal.type) {
-        case 'join':
-          joinRoom(connId, signal.roomId);
-          break;
-        case 'host':
-          createRoom(connId, signal.roomId, signal.game);
-          break;
-        default:
-          isHandled = false;
+    let isHandled = true;
+    // Room management
+    switch(signal.type) {
+      case 'join':
+        joinRoom(connId, signal.roomId);
+        break;
+      case 'host':
+        createRoom(connId, signal.roomId, signal.game);
+        break;
+      case 'admin':
+        listRooms(connId);
+        break;
+      default:
+        isHandled = false;
+    }
+
+    if(!isHandled) {
+      if(!signal.game || !games[signal.game] || !games[signal.game][signal.type]) {
+        // shouldn't happen - useful for debugging
+        console.log(signal);
+      } else {
+        games[signal.game][signal.type](signal);
       }
-
-      if(!isHandled) {
-        if(!signal.game || !games[signal.game] || !games[signal.game][signal.type]) {
-          console.log(signal);
-        } else {
-          games[signal.game][signal.type](signal);
-        }
-      }
-
-    });
-
-    ws.on('close', () => {
-      leaveAllRooms(connId);
-    });
+    }
 
   });
+
+  webSocket.on('close', leaveAllRooms(connId));
+}
+
+exports.initializeRooms = ({server, games}) => {
+  const wss = new WebSocketServer({ server });  
+  wss.on('connection', initializeClient(games));
 }
 
 exports.send = send;

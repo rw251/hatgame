@@ -19,11 +19,22 @@ const $setupEl = document.getElementById('hatgame-setup');
 const $gameEl = document.getElementById('hatgame-game');
 const $waitingMessage = document.getElementById('hatgame-waiting');
 
+let timeOfRound = 25000;
 let isPlayer = false;
 let names = [];
 let isStillPlaying = false;
+let startedAt;
+
+const getTimeRemaining = () => {
+  const endedAt = new Date();
+  const timeElapsed = endedAt - startedAt;
+  return Math.ceil((timeOfRound - timeElapsed) / 1000);
+};
+
 const removeNameAndGetNext = () => {
   if(names.length === 1) {
+    const secondsRemaining = getTimeRemaining();
+    console.log(`TIME REMAINING: ${secondsRemaining}s`);
     isStillPlaying = false;
     isPlayer = false;
     showHatGameResults(progress);
@@ -88,6 +99,8 @@ const showRound = (namesToPlay) => {
 
   // Show 3s countdown to player
   doCountdown(() => {
+    startedAt = new Date();
+
     setTimeout(() => {
       // Finish round
       if(isStillPlaying) {
@@ -95,7 +108,7 @@ const showRound = (namesToPlay) => {
         isPlayer = false;
         sendMessage({type:'endRound', game: 'hatgame', progress, isDeckEmpty: false});
       }
-    }, 25000);
+    }, timeOfRound);
 
     // enabled buttons
     $skipBtn.removeAttribute('disabled');

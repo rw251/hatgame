@@ -3,7 +3,8 @@ import { initWebSocket } from './scripts/web-sockets';
 import { showLandingButtons, wireUpLandingButtons } from './components/landing-page';
 import { showGameBar, setRoomLink } from './components/game-bar';
 import { updateGameState, showGameChooser, wireUpGameChooser } from './components/game-chooser';
-import { wireUpJoinPage, showJoinDialog } from './components/join-page';
+import { wireUpJoinPage, showJoinDialog, showNoRoom } from './components/join-page';
+import { showAdminPage, updateAdminPage } from './components/admin-page';
 import { initializeHatGame } from './games/hatgame';
 import { initializeScattergories } from './games/scattergories';
 
@@ -27,6 +28,8 @@ const displayPage = (pathname) => {
     showGameChooser();
   } else if (roomId === 'join') { // /join - join a new game
     showJoinDialog();
+  } else if (roomId === 'admin') { // /join - join a new game
+    showAdminPage();
   } else { // /xyz - a room
     joinRoom(roomId);    
     setRoomLink(roomId);
@@ -47,6 +50,12 @@ wsc.onmessage = function (evt) {
   switch (signal.type) {
     case 'state':
       updateGameState(signal);
+      break;
+    case 'admin':
+      updateAdminPage(signal);
+      break;
+    case 'noRoom':
+      showNoRoom(signal.roomId);
       break;
     default:
       console.log('Unrecognised signal', signal);
