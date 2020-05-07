@@ -1,8 +1,7 @@
 const WebSocketServer = require('ws').Server;
+const { id } = require('./utils');
 
 const wsClients = {};
-
-const id = () => Math.floor(Math.random()*10000000000);
 
 const rooms = {};
 

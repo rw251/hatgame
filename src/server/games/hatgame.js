@@ -1,4 +1,5 @@
 const { broadcastState, send, getRoom } = require('../rooms.js');
+const { id } = require('../utils');
 
 const start = ({roomId, connId}) => {
   const room = getRoom(roomId);
@@ -10,7 +11,7 @@ const start = ({roomId, connId}) => {
 const addName = ({roomId, name}) => {
   const room = getRoom(roomId);
   if(!room.names) room.names = [];
-  room.names.push(name);
+  room.names.push({ id: id(), name});
   room.state.numberOfNames = room.names.length;
   broadcastState(roomId);
 }
@@ -20,9 +21,9 @@ const endRound = ({roomId, progress, isDeckEmpty}) => {
   room.state.status = 'results';
   if(!room.doneNames) room.doneNames = [];
   room.names.forEach((name) => {
-    if(progress[name]) room.doneNames.push(name);
+    if(progress[name.id]) room.doneNames.push(name);
   });
-  room.names = room.names.filter(name => !progress[name]);
+  room.names = room.names.filter(name => !progress[name.id]);
   const namesLeft = room.names.length;
   if(namesLeft === 0) {
     room.names = room.doneNames;

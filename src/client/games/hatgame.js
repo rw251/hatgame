@@ -31,6 +31,12 @@ const getTimeRemaining = () => {
   return Math.ceil((timeOfRound - timeElapsed) / 1000);
 };
 
+const showNextName = () => {
+  const next = names[Math.floor(Math.random() * names.length)];
+  $nameEl.innerText = next.name;
+  $nameEl.dataset.id = next.id;
+}
+
 const removeNameAndGetNext = () => {
   if(names.length === 1) {
     const secondsRemaining = getTimeRemaining();
@@ -40,9 +46,9 @@ const removeNameAndGetNext = () => {
     showHatGameResults(progress);
     sendMessage({type:'endRound', game: 'hatgame', progress, isDeckEmpty: true});
   } else {
-    const firstIndex = names.indexOf($nameEl.innerText);
-    names.splice(firstIndex, 1);
-    $nameEl.innerText = names[Math.floor(Math.random() * names.length)];
+    const nameId = +$nameEl.dataset.id;
+    names = names.filter(x => x.id !== nameId);
+    showNextName()
   }
 };
 let progress = {};
@@ -67,8 +73,9 @@ function showHatGameResults(progress, allCardsAreGone){
   } else {
     $resultsHeader.style.display = 'block';
     $resultsList.innerHTML = Object
-      .keys(progress)
-      .map(x => `<li class="${progress[x]}">${x}</li>`)
+      .values(progress)
+      .sort((a,b) => a.orderOfName - b.orderOfName)
+      .map((value) => `<li class="${value.status}">${value.name}</li>`)
       .join('');
     if(Object.keys(progress).length === 0) {
       $resultsList.innerHTML = '<li>You didn\'t get any. Better luck next time!</li>';
@@ -81,13 +88,16 @@ function showHatGameResults(progress, allCardsAreGone){
   }
 }
 
-const showRound = (namesToPlay) => {
+let orderOfName = 0;
 
+const showRound = (namesToPlay) => {
   
   $gameEl.style.display = 'grid';
   $setupEl.style.display = 'none';
 
   names = namesToPlay;
+
+  orderOfName = 0;
 
   // disable buttons
   $skipBtn.setAttribute('disabled','disabled');
@@ -113,7 +123,7 @@ const showRound = (namesToPlay) => {
     // enabled buttons
     $skipBtn.removeAttribute('disabled');
     $gotItBtn.removeAttribute('disabled');
-    $nameEl.innerText = names[Math.floor(Math.random() * names.length)];
+    showNextName();
   });
 }
 
@@ -129,12 +139,14 @@ const nextRoundHatGame = () => {
 }
 
 const skipName = () => {
-  progress[$nameEl.innerText] = 'skipped';
+  progress[$nameEl.dataset.id] = {name: $nameEl.innerText, status: 'skipped', orderOfName};
+  orderOfName++;
   removeNameAndGetNext();
 };
 
 const gotName = () => {
-  progress[$nameEl.innerText] = 'got';
+  progress[$nameEl.dataset.id] = {name: $nameEl.innerText, status: 'got', orderOfName};
+  orderOfName++;
   removeNameAndGetNext();
 
   // prevent accidental double click
