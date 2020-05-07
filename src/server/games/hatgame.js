@@ -16,7 +16,7 @@ const addName = ({roomId, name}) => {
   broadcastState(roomId);
 }
 
-const endRound = ({roomId, progress, isDeckEmpty}) => {
+const endRound = ({roomId, progress, secondsRemaining}) => {
   const room = getRoom(roomId);
   room.state.status = 'results';
   if(!room.doneNames) room.doneNames = [];
@@ -34,6 +34,11 @@ const endRound = ({roomId, progress, isDeckEmpty}) => {
   }
   room.state.namesLeft = room.names.length;
   room.state.progress = progress;
+  if(secondsRemaining) {
+    room.state.secondsRemaining = secondsRemaining;
+  } else {
+    room.state.secondsRemaining = 0;
+  }
   broadcastState(roomId);
 }
 

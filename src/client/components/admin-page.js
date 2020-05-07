@@ -13,8 +13,8 @@ const showAdminPage = () => {
 
 const hatGameHtml = (room) => `<ul>
   <li>Participants: [${Object.keys(room.participants).join(', ')}]</li>
-  <li>Names: [${room.names ? room.names.join(', ') : ''}]</li>
-  <li>Done names: [${room.doneNames ? room.doneNames.join(', ') : ''}]</li>
+  <li>Names: [${room.names ? room.names.map(x=>x.name).join(', ') : ''}]</li>
+  <li>Done names: [${room.doneNames ? room.doneNames.map(x=>x.name).join(', ') : ''}]</li>
   <li>State: ${room.state.progress
     ? `${room.state.progress.firstRound
       ? `${room.state.status === 'results'

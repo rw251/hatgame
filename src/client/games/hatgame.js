@@ -19,7 +19,9 @@ const $setupEl = document.getElementById('hatgame-setup');
 const $gameEl = document.getElementById('hatgame-game');
 const $waitingMessage = document.getElementById('hatgame-waiting');
 
-let timeOfRound = 25000;
+const TIMER = 25000;
+let timeOfRound = TIMER;
+let timer;
 let isPlayer = false;
 let names = [];
 let isStillPlaying = false;
@@ -43,8 +45,9 @@ const removeNameAndGetNext = () => {
     console.log(`TIME REMAINING: ${secondsRemaining}s`);
     isStillPlaying = false;
     isPlayer = false;
+    clearTimeout(timer);
     showHatGameResults(progress);
-    sendMessage({type:'endRound', game: 'hatgame', progress, isDeckEmpty: true});
+    sendMessage({type:'endRound', game: 'hatgame', progress, secondsRemaining});
   } else {
     const nameId = +$nameEl.dataset.id;
     names = names.filter(x => x.id !== nameId);
@@ -65,7 +68,7 @@ const newName = () => {
   }
 }
 
-function showHatGameResults(progress, allCardsAreGone){
+function showHatGameResults(progress, allCardsAreGone, secondsRemaining){
   hideAllElements();
   $results.style.display = 'block';
   if(progress.firstRound) {
@@ -81,9 +84,12 @@ function showHatGameResults(progress, allCardsAreGone){
       $resultsList.innerHTML = '<li>You didn\'t get any. Better luck next time!</li>';
     }
     if(allCardsAreGone) {
-      $goAgainBtn.innerText = 'The hat was emptied. All the names are back in the hat.';
+      const timeRemaining = secondsRemaining ? ` There ${secondsRemaining>1?'are':'is'} still ${secondsRemaining} second${secondsRemaining>1?'s':''} remaining on the clock.` : '';
+      $goAgainBtn.innerText = `The hat was emptied. All the names are back in the hat.${timeRemaining}`;
+      timeOfRound = secondsRemaining * 1000;
     } else {
       $goAgainBtn.innerText = '';
+      timeOfRound = TIMER;
     }
   }
 }
@@ -111,12 +117,14 @@ const showRound = (namesToPlay) => {
   doCountdown(() => {
     startedAt = new Date();
 
-    setTimeout(() => {
+    console.log('Counting down from ' + timeOfRound);
+
+    timer = setTimeout(() => {
       // Finish round
       if(isStillPlaying) {
         showHatGameResults(progress, true);
         isPlayer = false;
-        sendMessage({type:'endRound', game: 'hatgame', progress, isDeckEmpty: false});
+        sendMessage({type:'endRound', game: 'hatgame', progress});
       }
     }, timeOfRound);
 
@@ -128,7 +136,7 @@ const showRound = (namesToPlay) => {
 }
 
 const startHatGame = () => {
-  sendMessage({type:'endRound', game: 'hatgame', progress: {firstRound:true}, isDeckEmpty: false});
+  sendMessage({type:'endRound', game: 'hatgame', progress: {firstRound:true}});
 };
 
 const nextRoundHatGame = () => {
@@ -167,7 +175,7 @@ const initializeHatGame = () =>{
 const showHatGamePlaying = () => {  
   if(!isPlayer) {
     hideAllElements();
-    $waitingMessage.style.display = 'block';
+    $waitingMessage.style.display = 'grid';
   }
 }
 
@@ -185,7 +193,7 @@ const updateState = (state) => {
   } else if(state.status === 'results') {
     console.log('showing results...');
     console.log(state.progress);
-    showHatGameResults(state.progress, state.allGone);
+    showHatGameResults(state.progress, state.allGone, +state.secondsRemaining);
   } else {
     console.log('name update...');
     $setupEl.style.display = 'block';

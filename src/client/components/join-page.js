@@ -3,6 +3,7 @@ import { joinRoom } from '../scripts/room-management';
 import { showGameBar, setRoomLink } from './game-bar';
 
 const $joinDialog = document.getElementById('join-dialog');
+const $noSuchRoom = document.getElementById('no-such-room');
 const $joinRoomInput = document.getElementById('join-room-input');
 const $joinSubmit = document.getElementById('join-submit');
 
@@ -34,7 +35,7 @@ const showJoinDialog = () => {
 
 const showNoRoom = (roomId) => {
   hideAllElements();
-  alert(`The roomId of "${roomId}" is wrong - please check and try again.`);
+  $noSuchRoom.innerText = `${roomId} is wrong, try again.`;
   $joinDialog.style.display = 'block';
   $joinRoomInput.focus();
 }

@@ -32,6 +32,7 @@
       font-family: 'HelveticaNeue-Light','Helvetica Neue Light','Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif;
       font-size: 1.2rem;
       margin: 0;
+      overflow-x: hidden;
     }    
     .page { 
       display: none;
@@ -206,6 +207,8 @@
       text-align: center;
       width: 100%;
       font-size: 150px;
+      z-index: 1;
+      pointer-events:none;
     }    
     @keyframes pulse {
       0% {
@@ -303,8 +306,9 @@
   </div>
 
   <div id="join-dialog" class="page">
+    <div id="no-such-room" style="font-size:2rem; line-height:4rem">Enter the 3 character room id</div>
     <form class="input-with-button" onsubmit="return false">
-      <input id="join-room-input" type="text" placeholder="Enter the room name" />
+      <input id="join-room-input" type="text" placeholder="Enter the room id" />
       <button id="join-submit">🡆</button>
     </form>
   </div>
@@ -332,17 +336,17 @@
     <p class="guest-only">The game will start when the host starts the game.</p>
   </div>
 
-  <div id="hatgame-game" class="page" style="grid-template-columns: 1fr 1fr;padding-top:40px">
+  <div id="hatgame-game" class="page page-narrow" style="grid-template-columns: 1fr 1fr;padding-top:40px">
     <h1 id="hatgame-name" style="grid-column-start: 1;grid-column-end:3;">A name will appear here</h1>
     <button id="hatgame-skip-button" disabled class="landing-page-button" style="background: #a0b0cb">Oops - made a mistake</button>
     <button id="hatgame-done-button" disabled class="landing-page-button">They got it!</button>
   </div>
 
-  <div id="hatgame-waiting" class="page">
+  <div id="hatgame-waiting" class="page page-narrow" style="height: 100vh;align-items: center;padding: 0px 20px;">
     <h1>A round is in progress - try and guess the name!</h1>
   </div>
 
-  <div id="hatgame-results" class="page">
+  <div id="hatgame-results" class="page page-narrow">
     <h1>Results</h1>
     <ul>
     </ul>
