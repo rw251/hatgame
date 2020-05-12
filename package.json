@@ -6,7 +6,9 @@
   "scripts": {
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
-    "open": "start http://localhost:3091",
+    "open:win32": "start http://localhost:3091",
+    "open:default": "xdg-open http://localhost:3091",
+    "open": "run-script-os",
     "prestart": "npm run open",
     "serve": "nodemon src/server/index.js",
     "start": "concurrently -kill-others-on-fail \"npm run serve\" \"npm run build:watch\""
@@ -31,6 +33,7 @@
     "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-rollbar-deploy": "^1.1.2",
     "rollup-plugin-rollbar-sourcemaps": "^1.1.0",
-    "rollup-plugin-terser": "^5.3.0"
+    "rollup-plugin-terser": "^5.3.0",
+    "run-script-os": "^1.1.1"
   }
 }
